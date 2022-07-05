@@ -12,9 +12,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v3
     - name: Log in to the Container registry
@@ -30,4 +27,4 @@ jobs:
     - name: Get envd version
       run: envd version --detail
     - name: Build and push
-      run: envd build --output type=image,name=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }},push=true
+      run: envd build --output type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push=true
