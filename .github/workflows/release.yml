@@ -5,6 +5,10 @@ on:
     branches: [ master ]
   pull_request:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,13 +17,17 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v3
-    - name: Docker Login
-      run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+    - name: Log in to the Container registry
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Install envd
       run: |
-        pip install envd
+        pip install --pre envd
         envd bootstrap
     - name: Get envd version
       run: envd version --detail
     - name: Build and push
-      run: envd build
+      run: envd build --output type=image,name=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }},push=true
